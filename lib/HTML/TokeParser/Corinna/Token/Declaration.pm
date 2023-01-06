@@ -4,8 +4,7 @@ class HTML::TokeParser::Corinna::Token::Declaration : isa(HTML::TokeParser::Cori
     use HTML::TokeParser::Corinna::Policy;
 
     # ["D",  $text]
-    field $token : param;
-    field $to_string = $token->[1];
+    field $to_string :param;
     method is_declaration {true}
     method to_string      {$to_string}
 }

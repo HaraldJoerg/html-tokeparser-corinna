@@ -5,9 +5,8 @@ class HTML::TokeParser::Corinna::Token::Tag::End : isa(HTML::TokeParser::Corinna
     use HTML::TokeParser::Corinna::Policy;
 
     # ["E",  $tag, $text]
-    field $token : param;
-    field $tag       = $token->[1];
-    field $to_string = $token->[2];
+    field $tag       : param;
+    field $to_string : param;
 
     method tag       {$tag}
     method to_string {$to_string}
@@ -22,7 +21,7 @@ class HTML::TokeParser::Corinna::Token::Tag::End : isa(HTML::TokeParser::Corinna
             throw( VoidContext => method => 'normalize_tag' );
         }
         my $new_tag = lc $tag;
-        return ( ref $self )->new( token => [ 'E', $new_tag, sprintf "</%s>" => $new_tag ] );
+        return ( ref $self )->new( tag => $new_tag, to_string => sprintf ("</%s>" => $new_tag ));
     }
 }
 

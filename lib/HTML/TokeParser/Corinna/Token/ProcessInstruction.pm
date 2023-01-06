@@ -4,10 +4,8 @@ class HTML::TokeParser::Corinna::Token::ProcessInstruction : isa(HTML::TokeParse
     use HTML::TokeParser::Corinna::Policy;
 
     # ["PI", $token0, $text]
-    field $token : param;
-    field $token0;
-    field $to_string;
-    ADJUST { (undef, $token0, $to_string ) = $token->@*; }
+    field $token0    : param;
+    field $to_string : param;
 
     method tag                    { }
     method token0                 {$token0}

@@ -5,8 +5,7 @@ class HTML::TokeParser::Corinna::Token::Comment : isa(HTML::TokeParser::Corinna:
     use HTML::TokeParser::Corinna::Policy;
 
     # ["C",  $text]
-    field $token : param;
-    field $to_string = $token->[1];
+    field $to_string : param;
     method is_comment {true}
     method to_string  {$to_string}
 }

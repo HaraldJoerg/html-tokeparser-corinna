@@ -4,12 +4,10 @@ class HTML::TokeParser::Corinna::Token::Tag::Start : isa(HTML::TokeParser::Corin
     use HTML::TokeParser::Corinna::Policy;
     use HTML::Entities qw/encode_entities/;
 
-    # ["S",  $tag, $attr, $attrseq, $text]
-    field $token : param;
-    field $tag       = $token->[1];
-    field $attr      = $token->[2];
-    field $attrseq   = $token->[3];
-    field $to_string = $token->[4];
+    field $tag       : param;
+    field $attr      : param;
+    field $attrseq   : param;
+    field $to_string : param;
 
     method tag {$tag}
 
@@ -88,7 +86,10 @@ class HTML::TokeParser::Corinna::Token::Tag::Start : isa(HTML::TokeParser::Corin
         }
         $new_tag = sprintf '<%s%s%s>', $tag, $new_tag, $self_closing;
 
-        return (ref $self)->new( token => [ 'S', $tag, $attributes, $sequence, $new_tag ] );
+        return (ref $self)->new( tag => $tag,
+                                 attr => $attributes,
+                                 attrseq => $sequence,
+                                 to_string => $new_tag );
     }
 }
 

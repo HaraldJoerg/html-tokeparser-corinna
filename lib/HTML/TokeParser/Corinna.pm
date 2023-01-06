@@ -1,34 +1,16 @@
 use v5.37.8;
 use experimental 'class';
-use HTML::TokeParser::Corinna::Base;
 class HTML::TokeParser::Corinna :isa(HTML::TokeParser::Corinna::Base) {
     use HTML::TokeParser::Corinna::Policy;
 
     use HTML::TokeParser 3.25;
 
-    use HTML::TokeParser::Corinna::Token;
-    use HTML::TokeParser::Corinna::Token::Tag;
-    use HTML::TokeParser::Corinna::Token::Tag::Start;
-    use HTML::TokeParser::Corinna::Token::Tag::End;
-    use HTML::TokeParser::Corinna::Token::Text;
-    use HTML::TokeParser::Corinna::Token::Comment;
-    use HTML::TokeParser::Corinna::Token::Declaration;
-    use HTML::TokeParser::Corinna::Token::ProcessInstruction;
-    use HTML::TokeParser::Corinna::Exception;
-
-    # should be class data
-    my %TOKEN_CLASSES = (
-        S  => 'HTML::TokeParser::Corinna::Token::Tag::Start',
-        E  => 'HTML::TokeParser::Corinna::Token::Tag::End',
-        T  => 'HTML::TokeParser::Corinna::Token::Text',
-        C  => 'HTML::TokeParser::Corinna::Token::Comment',
-        D  => 'HTML::TokeParser::Corinna::Token::Declaration',
-        PI => 'HTML::TokeParser::Corinna::Token::ProcessInstruction',
-    );
+    use HTML::TokeParser::Corinna::TokenFactory;
 
     field $html : param = undef;
     field $file : param = undef;
     field $parser;
+    field $_factory = HTML::TokeParser::Corinna::TokenFactory->new();
     ADJUST {
         unless ( $html xor $file ) {
             throw(
@@ -42,10 +24,15 @@ class HTML::TokeParser::Corinna :isa(HTML::TokeParser::Corinna::Base) {
     }
 
     method get_token (@args) {
-        my $token         = $parser->get_token(@args) or return;
-        my $factory_class = $TOKEN_CLASSES{ $token->[0] }
-          or throw( PANIC => message => "Cannot determine token class for token (@$token)" );
-        return $factory_class->new( token => $token );
+        my $token          = $parser->get_token(@args) or return;
+        my $factory_method = $token->[0];
+        try {
+            return $_factory->$factory_method($token->@[1..$token->$#*]);
+        }
+        catch ($e) {
+            throw( PANIC => message => "Cannot determine token class for token (@$token)",
+                   method => __PACKAGE__ . '::get_token');
+        }
     }
 
     method get_tag (@args) {
@@ -54,10 +41,8 @@ class HTML::TokeParser::Corinna :isa(HTML::TokeParser::Corinna::Base) {
         # for some reason, HTML::Parser strips the leading letter if we
         # fetch tags directly
         my $is_start = $token->[0] !~ /^\//;
-        unshift @$token => $is_start ? 'S' : 'E';
-        return $is_start
-          ? HTML::TokeParser::Corinna::Token::Tag::Start->new( token => $token )
-          : HTML::TokeParser::Corinna::Token::Tag::End->new( token => $token );
+        my $factory_method = $is_start ? 'S' : 'E';
+        return $_factory->$factory_method(@$token);
     }
 
     method peek ( $count = 1 ) {
@@ -467,6 +452,8 @@ http://www.perlmonks.org/index.pl?node_id=230667 for more information.
 There are no known bugs, but that's no guarantee.
 
 =head1 SEE ALSO
+
+L<HTML::TokeParser::Corinna::TokenFactory>
 
 L<HTML::TokeParser::Corinna::Token>
 

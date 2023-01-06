@@ -7,7 +7,7 @@ use Test::Most;
 use HTML::TokeParser::Corinna;
 
 subtest 'text tokens' => sub {
-    ok my $token = HTML::TokeParser::Corinna::Token::Text->new( token => [ 'T', 'This is my text' ] ),
+    ok my $token = HTML::TokeParser::Corinna::TokenFactory->new->T( 'This is my text' ),
       'We should be able to create a text object';
     is $token->to_string, 'This is my text',
       '... and we should be able to get the string representation of the token';
@@ -33,7 +33,7 @@ subtest 'text tokens' => sub {
 };
 
 subtest 'comment tokens' => sub {
-    ok my $token = HTML::TokeParser::Corinna::Token::Comment->new( token => [ 'C', '<!-- this is a comment -->' ] ),
+    ok my $token = HTML::TokeParser::Corinna::TokenFactory->new->C( '<!-- this is a comment -->' ),
       'We should be able to create a comment object';
     is $token->to_string, '<!-- this is a comment -->',
       '... and we should be able to get the string representation of the comment';
@@ -57,7 +57,7 @@ subtest 'declaration tokens' => sub {
       "-//W3C//DTD XHTML 1.0 Transitional//EN"
       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     END
-    ok my $token = HTML::TokeParser::Corinna::Token::Declaration->new( token => [ 'D', $declaration ] ),
+    ok my $token = HTML::TokeParser::Corinna::TokenFactory->new->D( $declaration ),
       'We should be able to create a declaration object';
     is $token->to_string, $declaration,
       '... and we should be able to get the string representation of the declaration';
@@ -78,7 +78,7 @@ subtest 'declaration tokens' => sub {
 subtest 'process instruction tokens' => sub {
     my $token0 = 'xml-stylesheet type="text/xsl" href="style.xsl"';
     my $pi     = "<?$token0?>";
-    ok my $token = HTML::TokeParser::Corinna::Token::ProcessInstruction->new( token => [ 'PR', $token0, $pi ] ),
+    ok my $token = HTML::TokeParser::Corinna::TokenFactory->new->PI( $token0, $pi ),
       'We should be able to create a process instruction object';
     is $token->to_string, $pi,
       '... and we should be able to get the string representation of the process instruction';
@@ -100,7 +100,7 @@ subtest 'process instruction tokens' => sub {
 subtest 'end tag tokens' => sub {
 
     ok my $token
-      = HTML::TokeParser::Corinna::Token::Tag::End->new( token => [ 'E', 'p', '</p>' ] ),
+      = HTML::TokeParser::Corinna::TokenFactory->new->E( 'p', '</p>' ),
       'We should be able to create a tag object';
     is $token->to_string, '</p>',
       '... and we should be able to get the string representation of the tag';
@@ -132,7 +132,7 @@ subtest 'start tag tokens' => sub {
 
     # abstract class
     ok my $token
-      = HTML::TokeParser::Corinna::Token::Tag::Start->new( token => [ 'S', $tag, $attr, $attrseq, $full_tag ] ),
+      = HTML::TokeParser::Corinna::TokenFactory->new->S( $tag, $attr, $attrseq, $full_tag ),
       'We should be able to create a tag object';
     is $token->to_string, $full_tag,
       '... and we should be able to get the string representation of the tag';
